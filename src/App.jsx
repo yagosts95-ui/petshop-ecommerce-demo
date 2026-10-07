@@ -8,7 +8,7 @@ import {
   Clock
 } from 'lucide-react'
 
-const STORAGE_PRODUCTS = 'depaula_demo_products_v3'
+const STORAGE_PRODUCTS = 'depaula_demo_products_v4'
 const STORAGE_ORDERS = 'depaula_demo_orders_v2'
 const STORAGE_CART = 'depaula_demo_cart_v1'
 
@@ -34,7 +34,7 @@ const categories = [
 
 const initialProducts = [
   { id: 1, name: 'Ração Golden Formula Carne e Arroz Cães Adultos 15kg', price: 179.90, stock: 10, category: 'Cães', brand: 'PremieR Golden', image: 'https://down-br.img.susercontent.com/file/aee335f5884fc05f236f2b1f0b616a28' },
-  { id: 2, name: 'Petisco Pedigree Dentastix Cuidado Oral Cães Adultos', price: 18.90, stock: 19, category: 'Cães', brand: 'Pedigree', image: 'https://images.petz.com.br/fotos/1626273514718.jpg' },
+  { id: 2, name: 'Petisco Pedigree Dentastix Daily Oral Care', price: 18.90, stock: 19, category: 'Cães', brand: 'Pedigree', image: 'https://petsland-egy.com/cdn/shop/files/5998749109113_FOP.png?v=1736788231' },
   { id: 3, name: 'Ração Whiskas Carne para Gatos Adultos 10,1kg', price: 194.00, stock: 14, category: 'Gatos', brand: 'Whiskas', image: 'https://cdn.awsli.com.br/1714/1714337/produto/266796472/racao-whiskas-carne-gatos-adultos-101-kg-1-removebg-preview-lcbpckuxx1.png' },
   { id: 4, name: 'Ração GranPlus Choice Gatos Adultos Frango e Carne 10,1kg', price: 144.99, stock: 8, category: 'Gatos', brand: 'GranPlus', image: 'https://down-br.img.susercontent.com/file/br-11134207-7r98o-lz6mamyp53xhd9' },
   { id: 5, name: 'Areia Higiênica Pipicat Classic 4kg', price: 15.99, stock: 9, category: 'Gatos', brand: 'Pipicat', image: 'https://cdn.awsli.com.br/800x800/1999/1999267/produto/306072262/areia-higienica-para-gatos-pipicat-classic-4kg-7nk4xc7yq5.jpg' },
