@@ -1,0 +1,1 @@
+Envie aqui a logo transparente padronizada com o nome exato: logo-id-digital.png\n
