@@ -86,3 +86,78 @@
   .hero-dots{bottom:7px;padding:5px 7px;gap:6px}
   .hero-dot{width:7px;height:7px}.hero-dot.active{width:20px}
 }
+
+/* Header/logo refinement */
+.brand{gap:10px}
+.brand-copy{min-width:0}
+.brand-mark{width:66px;height:66px;border-width:3px;background:linear-gradient(180deg,#ffd51f 0 46%,#075bd8 46% 100%);box-shadow:inset 0 0 0 4px #fff,0 4px 12px rgba(7,91,216,.10);overflow:hidden}
+.brand-mark .brand-roof{position:absolute;top:11px;font-size:20px;line-height:1;color:#075bd8;font-weight:900}
+.brand-mark .brand-d{font-weight:900;font-size:18px;transform:translateY(7px)}
+.brand-mark small{font-size:8px;font-weight:900;transform:translateY(-4px)}
+.brand strong{font-size:24px;line-height:.96}
+.brand span{font-size:11px}
+
+/* Desktop slider tighter and cleaner */
+.hero-slider-wrap{padding-top:0}
+.hero-slider-frame{max-height:560px}
+.hero-banner-image{object-position:center center}
+
+/* Mobile polish */
+.mobile-category-strip{display:none}
+@media (max-width:900px){
+  .top-header{position:sticky;top:0}
+  .header-inner{padding:10px 12px;gap:8px;min-height:70px}
+  .mobile-menu{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#eef5ff}
+  .brand{gap:8px}
+  .brand-mark{width:46px;height:46px;flex:0 0 46px}
+  .brand-mark .brand-roof{top:7px;font-size:13px}
+  .brand-mark .brand-d{font-size:12px;transform:translateY(5px)}
+  .brand-mark small{font-size:6px;transform:translateY(-2px)}
+  .brand-copy strong{font-size:17px;line-height:.95}
+  .brand-copy span{font-size:8px;white-space:nowrap}
+  .header-actions{gap:5px}
+  .header-action{width:34px;height:34px;display:grid;place-items:center;padding:0;border-radius:10px;background:#f7f9fd}
+  .header-action svg{width:18px;height:18px}
+  .header-action i{top:-3px;left:20px;font-size:9px;padding:1px 4px}
+  .mobile-search-wrap{padding:8px 12px 10px;gap:8px;border-top:1px solid #edf1f6}
+  .mobile-search-wrap .search-wrap{min-height:44px;border-radius:11px}
+  .mobile-search-wrap .whatsapp{padding:11px 14px;border-radius:11px;font-size:14px}
+  .mobile-category-strip{display:flex;gap:7px;overflow-x:auto;padding:2px 0 2px;scrollbar-width:none}
+  .mobile-category-strip::-webkit-scrollbar{display:none}
+  .mobile-category-strip button{border:1px solid #dbe7f7;background:#fff;color:#0b397a;border-radius:999px;padding:8px 11px;display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:12px;font-weight:800}
+  .hero-slider-wrap{padding:0 0 10px}
+  .hero-slider-frame{border-radius:0;aspect-ratio:1916/821;box-shadow:none}
+  .hero-banner-image{object-fit:contain;background:#ffd321}
+  .hero-arrow{width:30px;height:30px;font-size:21px}
+  .hero-arrow-left{left:6px}.hero-arrow-right{right:6px}
+  .hero-dots{bottom:6px;padding:4px 6px;gap:5px}
+  .hero-dot{width:7px;height:7px}
+  .hero-dot.active{width:18px}
+  .category-cards{display:flex;overflow-x:auto;gap:10px;padding:10px 10px 14px;scroll-snap-type:x mandatory}
+  .category-cards::-webkit-scrollbar{display:none}
+  .category-card{min-width:245px;grid-template-columns:44% 56%;scroll-snap-align:start}
+  .category-photo{min-height:150px}
+  .section-heading{align-items:flex-start;gap:8px}
+  .section-heading p{max-width:210px}
+}
+
+@media (max-width:520px){
+  .header-inner{padding:8px 10px;min-height:62px}
+  .brand-copy strong{font-size:15px}
+  .brand-copy span{font-size:7px}
+  .brand-mark{width:42px;height:42px;flex-basis:42px}
+  .mobile-menu{width:30px;height:30px}
+  .header-actions{gap:3px}
+  .header-action{width:30px;height:30px}
+  .mobile-search-wrap{padding:7px 10px 9px}
+  .mobile-search-wrap .search-wrap{min-height:42px}
+  .mobile-search-wrap .whatsapp{font-size:13px;padding:10px 12px}
+  .mobile-category-strip button{font-size:11px;padding:7px 10px}
+  .hero-slider-frame{aspect-ratio:1916/821}
+  .category-card{min-width:225px}
+  .products-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .product-card{padding:9px;min-height:350px}
+  .product-card h3{font-size:12px;min-height:68px}
+  .product-card>strong{font-size:18px}
+  .product-card>button{font-size:11px}
+}
