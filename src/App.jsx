@@ -367,19 +367,23 @@ function Admin() {
     setProducts(current=>current.map(p=>p.id===id?{...p,stock:Math.max(0,p.stock+delta)}:p))
   }
 
+  function goTo(id) {
+    document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'})
+  }
+
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
         <Logo />
         <div className="admin-nav">
-          <button className="active"><LayoutDashboard/> Dashboard</button>
-          <button><ClipboardList/> Pedidos</button>
-          <button><Package/> Produtos</button>
-          <button><Warehouse/> Estoque</button>
+          <button className="active" onClick={()=>goTo('admin-dashboard')}><LayoutDashboard/> Dashboard</button>
+          <button onClick={()=>goTo('admin-orders')}><ClipboardList/> Pedidos</button>
+          <button onClick={()=>goTo('admin-stock')}><Package/> Produtos</button>
+          <button onClick={()=>goTo('admin-stock')}><Warehouse/> Estoque</button>
         </div>
         <Link to="/">← Voltar para loja</Link>
       </aside>
-      <main className="admin-main">
+      <main className="admin-main" id="admin-dashboard">
         <div className="admin-top"><div><span>PAINEL ADMINISTRATIVO</span><h1>Operação da loja</h1></div><div className="demo-chip">Demo local funcional</div></div>
         <div className="stats-grid">
           <StatCard icon={ClipboardList} label="Pedidos" value={orders.length}/>
@@ -388,19 +392,22 @@ function Admin() {
           <StatCard icon={AlertTriangle} label="Estoque baixo" value={products.filter(p=>p.stock<=8).length} warn/>
         </div>
 
-        <section className="admin-panel">
+        <section className="admin-panel" id="admin-orders">
           <div className="panel-title"><div><h2>Pedidos</h2><p>Pedidos feitos na loja aparecem aqui automaticamente neste navegador.</p></div></div>
           <div className="orders-table">
             <div className="table-row table-head"><span>Pedido</span><span>Cliente</span><span>Itens</span><span>Total</span><span>Status</span><span>Ação</span></div>
-            {orders.map(order=><div className="table-row" key={order.id}>
-              <strong>{order.id}</strong><span>{order.customer}</span><span>{order.itemCount}</span><span>{money(order.total)}</span>
-              <span><b className={'status '+order.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}>{order.status}</b></span>
+            {orders.map(order=><div className="table-row order-row" key={order.id}>
+              <strong data-label="Pedido">{order.id}</strong>
+              <span data-label="Cliente">{order.customer}</span>
+              <span data-label="Itens">{order.itemCount}</span>
+              <span data-label="Total">{money(order.total)}</span>
+              <span data-label="Status"><b className={'status '+order.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}>{order.status}</b></span>
               <button className="advance-btn" disabled={order.status==='Concluído'} onClick={()=>advanceOrder(order.id)}>{order.status==='Concluído'?'Concluído':'Avançar status'}</button>
             </div>)}
           </div>
         </section>
 
-        <section className="admin-panel">
+        <section className="admin-panel" id="admin-stock">
           <div className="panel-title"><div><h2>Controle de estoque</h2><p>As alterações refletem na vitrine da loja neste navegador.</p></div></div>
           <div className="stock-grid">
             {products.map(p=><div className="stock-item" key={p.id}>
