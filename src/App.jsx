@@ -3,32 +3,39 @@ import { Routes, Route, Link } from 'react-router-dom'
 import {
   Menu, Search, UserRound, ShoppingCart, Dog, Cat, Bird, Rabbit,
   Bone, HeartPulse, Tag, MessageCircle, Store, Truck, CheckCircle2,
-  PackageCheck, Boxes, CircleDollarSign, AlertTriangle, ChevronRight,
+  PackageCheck, CircleDollarSign, AlertTriangle, ChevronRight,
   Plus, Minus, LayoutDashboard, ClipboardList, Package, Warehouse
 } from 'lucide-react'
 
+const petPhotos = {
+  dog: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=88',
+  cat: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=900&q=88',
+  bird: 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=900&q=88',
+  rabbit: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=900&q=88'
+}
+
 const categories = [
-  { name: 'Cães', icon: Dog, subtitle: 'Rações, petiscos e acessórios', tone: 'blue' },
-  { name: 'Gatos', icon: Cat, subtitle: 'Rações, areia higiênica e acessórios', tone: 'pink' },
-  { name: 'Pássaros', icon: Bird, subtitle: 'Rações, sementes e acessórios', tone: 'yellow' },
-  { name: 'Coelhos', icon: Rabbit, subtitle: 'Rações, feno, higiene e acessórios', tone: 'green' },
+  { name: 'Cães', icon: Dog, subtitle: 'Rações, petiscos e acessórios', tone: 'blue', photo: petPhotos.dog },
+  { name: 'Gatos', icon: Cat, subtitle: 'Rações, areia higiênica e acessórios', tone: 'pink', photo: petPhotos.cat },
+  { name: 'Pássaros', icon: Bird, subtitle: 'Rações, sementes e acessórios', tone: 'yellow', photo: petPhotos.bird },
+  { name: 'Coelhos', icon: Rabbit, subtitle: 'Rações, feno, higiene e acessórios', tone: 'green', photo: petPhotos.rabbit },
 ]
 
 const initialProducts = [
-  { id: 1, name: 'Ração Golden Cães Adultos Carne e Arroz 15kg', price: 189.90, stock: 10, category: 'Cães', badge: 'GOLDEN', accent: '#123e7c' },
-  { id: 2, name: 'Ração Whiskas Gatos Adultos Carne 10,1kg', price: 119.90, stock: 14, category: 'Gatos', badge: 'WHISKAS', accent: '#8d1b8d' },
-  { id: 3, name: 'Ração Premium Pássaros Seleção 500g', price: 22.90, stock: 22, category: 'Pássaros', badge: 'AVES', accent: '#f4b700' },
-  { id: 4, name: 'Ração Coelhos Adultos 700g', price: 34.90, stock: 6, category: 'Coelhos', badge: 'BUNNY', accent: '#6e9d67' },
-  { id: 5, name: 'Petisco Dental para Cães 90g', price: 18.90, stock: 19, category: 'Cães', badge: 'PETISCO', accent: '#e26b2e' },
-  { id: 6, name: 'Areia Higiênica Premium 4kg', price: 29.90, stock: 9, category: 'Gatos', badge: 'AREIA', accent: '#6e5fb7' },
-  { id: 7, name: 'Mix de Sementes Premium 1kg', price: 19.90, stock: 17, category: 'Pássaros', badge: 'MIX', accent: '#ca8b00' },
-  { id: 8, name: 'Feno Natural Selecionado 500g', price: 27.90, stock: 8, category: 'Coelhos', badge: 'FENO', accent: '#729d3b' },
+  { id: 1, name: 'Ração Golden Formula Carne, Arroz e Vegetais Cães Adultos 15kg', price: 179.90, stock: 10, category: 'Cães', brand: 'PremieR', badge: 'GOLDEN', accent: '#123e7c', detail: '15 kg' },
+  { id: 2, name: 'Ração Whiskas Carne para Gatos Adultos 10,1kg', price: 199.90, stock: 14, category: 'Gatos', brand: 'Whiskas', badge: 'WHISKAS', accent: '#8d1b8d', detail: '10,1 kg' },
+  { id: 3, name: 'Ração GranPlus Choice Gatos Adultos Frango e Carne 10,1kg', price: 119.99, stock: 8, category: 'Gatos', brand: 'GranPlus', badge: 'CHOICE', accent: '#bb1839', detail: '10,1 kg' },
+  { id: 4, name: 'Ração Nutrópica Calopsita Gourmet 300g', price: 49.99, stock: 16, category: 'Pássaros', brand: 'Nutrópica', badge: 'GOURMET', accent: '#ecad00', detail: '300 g' },
+  { id: 5, name: 'Mistura para Calopsita, Agapornis e Rose Faces 500g', price: 10.50, stock: 24, category: 'Pássaros', brand: 'Nutripássaros', badge: 'MIX AVES', accent: '#d8a400', detail: '500 g' },
+  { id: 6, name: 'Areia Pipicat Classic para Gatos 4kg', price: 40.90, stock: 9, category: 'Gatos', brand: 'Pipicat', badge: 'CLASSIC', accent: '#5e6bb4', detail: '4 kg' },
+  { id: 7, name: 'Ração Nutrópica para Coelho Adulto Super Premium 500g', price: 49.99, stock: 7, category: 'Coelhos', brand: 'Nutrópica', badge: 'COELHO', accent: '#669a4d', detail: '500 g' },
+  { id: 8, name: 'Ração Funny Bunny Delícias da Horta 500g', price: 21.99, stock: 12, category: 'Coelhos', brand: 'Supra', badge: 'FUNNY BUNNY', accent: '#7ca55b', detail: '500 g' },
 ]
 
 const demoOrders = [
-  { id: '#1024', customer: 'Cliente Demo', total: 189.90, status: 'Novo', items: 1 },
-  { id: '#1023', customer: 'Mariana Silva', total: 238.70, status: 'Separando', items: 3 },
-  { id: '#1022', customer: 'Carlos Henrique', total: 92.50, status: 'Pronto', items: 2 },
+  { id: '#1024', customer: 'Cliente Demo', total: 179.90, status: 'Novo', items: 1 },
+  { id: '#1023', customer: 'Mariana Silva', total: 239.88, status: 'Separando', items: 3 },
+  { id: '#1022', customer: 'Carlos Henrique', total: 90.89, status: 'Pronto', items: 2 },
 ]
 
 function Logo() {
@@ -46,10 +53,11 @@ function Logo() {
 function ProductVisual({ product }) {
   return (
     <div className="product-visual" style={{'--accent': product.accent}}>
-      <div className="bag">
-        <small>D' PAULA</small>
+      <div className="real-pack">
+        <div className="pack-top">{product.brand}</div>
         <b>{product.badge}</b>
         <span>{product.category}</span>
+        <small>{product.detail}</small>
       </div>
     </div>
   )
@@ -110,19 +118,30 @@ function Storefront() {
       </nav>
 
       <main>
-        <section className="hero">
+        <section className="hero hero-v2">
           <div className="hero-copy">
+            <span className="hero-kicker">D' PAULA CASA DO CRIADOR</span>
             <h1>Rações e produtos <span>para cães, gatos, pássaros e coelhos!</span></h1>
-            <p>Qualidade, bem-estar e tudo o que seu pet precisa em um só lugar.</p>
-            <button onClick={()=>document.getElementById('produtos')?.scrollIntoView({behavior:'smooth'})}>Ver produtos <ChevronRight/></button>
+            <p>Qualidade, variedade e praticidade para cuidar de quem faz parte da família.</p>
+            <div className="hero-buttons">
+              <button onClick={()=>document.getElementById('produtos')?.scrollIntoView({behavior:'smooth'})}>Ver produtos <ChevronRight/></button>
+              <a href="#" className="hero-secondary"><MessageCircle size={18}/> Pedir ajuda</a>
+            </div>
+            <div className="hero-trust">
+              <span><CheckCircle2 size={16}/> Compra prática</span>
+              <span><Store size={16}/> Retirada na loja</span>
+            </div>
           </div>
-          <div className="hero-animals" aria-label="Cães, gatos, pássaros e coelhos">
-            <div className="animal animal-dog">🐶</div>
-            <div className="animal animal-cat">🐱</div>
-            <div className="animal animal-bird">🐦</div>
-            <div className="animal animal-rabbit">🐰</div>
+
+          <div className="hero-photo-stage">
+            <div className="yellow-orbit"></div>
+            <img className="pet-photo dog-photo" src={petPhotos.dog} alt="Cachorro" />
+            <img className="pet-photo cat-photo" src={petPhotos.cat} alt="Gato" />
+            <img className="pet-photo bird-photo" src={petPhotos.bird} alt="Pássaro" />
+            <img className="pet-photo rabbit-photo" src={petPhotos.rabbit} alt="Coelho" />
             <div className="hero-note">Pets felizes<br/>tornam a vida<br/>mais especial! ♡</div>
           </div>
+
           <div className="hero-features">
             <div><Truck/><span>Entrega para<br/>toda a região</span></div>
             <div><Store/><span>Retirada<br/>na loja</span></div>
@@ -134,22 +153,26 @@ function Storefront() {
         <section className="category-cards section">
           {categories.map(c => (
             <button key={c.name} className={'category-card ' + c.tone} onClick={()=>setSelectedCategory(c.name)}>
-              <div className="category-pet"><c.icon size={72}/></div>
-              <div><h3>{c.name}</h3><p>{c.subtitle}</p><span>Ver produtos <ChevronRight size={15}/></span></div>
+              <img className="category-photo" src={c.photo} alt={c.name}/>
+              <div className="category-copy"><h3>{c.name}</h3><p>{c.subtitle}</p><span>Ver produtos <ChevronRight size={15}/></span></div>
             </button>
           ))}
         </section>
 
         <section id="produtos" className="section products-section">
-          <div className="section-heading"><div><h2>Produtos em destaque</h2><span></span></div><button onClick={()=>setSelectedCategory('Todos')}>Ver todos os produtos <ChevronRight size={18}/></button></div>
+          <div className="section-heading">
+            <div><h2>Produtos em destaque</h2><span></span><p>Itens reais usados como referência visual para a demonstração.</p></div>
+            <button onClick={()=>setSelectedCategory('Todos')}>Ver todos os produtos <ChevronRight size={18}/></button>
+          </div>
           <div className="products-grid">
             {products.map(product => (
               <article className="product-card" key={product.id}>
                 <ProductVisual product={product}/>
+                <span className="product-brand">{product.brand}</span>
                 <h3>{product.name}</h3>
-                <div className="rating">★★★★★ <small>(demo)</small></div>
+                <div className="rating">★★★★★ <small>produto de referência</small></div>
                 <strong>R$ {product.price.toFixed(2).replace('.', ',')}</strong>
-                <small>Estoque: {product.stock} unidades</small>
+                <small>Estoque demo: {product.stock} unidades</small>
                 <button onClick={()=>add(product)}><ShoppingCart size={17}/> Adicionar ao carrinho</button>
               </article>
             ))}
@@ -157,9 +180,9 @@ function Storefront() {
         </section>
 
         <section className="section service-banners">
-          <div className="service-card pickup"><Store/><div><h3>Retirada na loja</h3><p>Compre online e retire na loja com toda a comodidade.</p></div></div>
-          <div className="service-card support"><MessageCircle/><div><h3>Atendimento via WhatsApp</h3><p>Tire suas dúvidas, peça indicações e receba atendimento especial.</p></div></div>
-          <div className="service-card delivery"><Truck/><div><h3>Entrega para toda a região</h3><p>Seu pedido com segurança e rapidez.</p></div></div>
+          <div className="service-card pickup"><Store/><div><h3>Retirada na loja</h3><p>Compre online, receba a confirmação e retire quando estiver pronto.</p></div><ChevronRight/></div>
+          <div className="service-card support"><MessageCircle/><div><h3>Atendimento via WhatsApp</h3><p>Dúvidas sobre ração, tamanho ou disponibilidade? Fale com a loja.</p></div><ChevronRight/></div>
+          <div className="service-card delivery"><Truck/><div><h3>Entrega para a região</h3><p>Fluxo preparado para incluir entrega conforme a operação da loja.</p></div><ChevronRight/></div>
         </section>
 
         {cart.length > 0 && (
