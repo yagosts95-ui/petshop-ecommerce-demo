@@ -351,8 +351,25 @@ function StatCard({icon: Icon, label, value, warn}) {
 function Admin() {
   const [orders,setOrders]=usePersistentState(STORAGE_ORDERS,seedOrders)
   const [products,setProducts]=usePersistentState(STORAGE_PRODUCTS,initialProducts)
-  const totalSales = orders.filter(o=>o.status!=='Cancelado').reduce((s,o)=>s+Number(o.total||0),0)
-  const separating = orders.filter(o=>['Aceito','Separando'].includes(o.status)).length
+  const [activeSection,setActiveSection]=useState('dashboard')
+
+  const activeOrders = orders.filter(o=>o.status!=='Cancelado')
+  const totalSales = activeOrders.reduce((s,o)=>s+Number(o.total||0),0)
+  const pendingOrders = orders.filter(o=>['Novo','Aceito','Separando'].includes(o.status)).length
+  const readyOrders = orders.filter(o=>o.status==='Pronto').length
+  const avgTicket = activeOrders.length ? totalSales / activeOrders.length : 0
+  const lowStock = products.filter(p=>p.stock<=8)
+  const completedOrders = orders.filter(o=>o.status==='Concluído').length
+
+  const salesBars = [
+    {label:'Seg',value:38},
+    {label:'Ter',value:55},
+    {label:'Qua',value:44},
+    {label:'Qui',value:72},
+    {label:'Sex',value:88},
+    {label:'Sáb',value:64},
+    {label:'Hoje',value:96},
+  ]
 
   function advanceOrder(id) {
     const flow=['Novo','Aceito','Separando','Pronto','Concluído']
@@ -367,33 +384,83 @@ function Admin() {
     setProducts(current=>current.map(p=>p.id===id?{...p,stock:Math.max(0,p.stock+delta)}:p))
   }
 
-  function goTo(id) {
-    document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'})
+  function goTo(id,section='dashboard') {
+    setActiveSection(section)
+    requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}))
   }
 
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
         <Logo />
-        <div className="admin-nav">
-          <button className="active" onClick={()=>goTo('admin-dashboard')}><LayoutDashboard/> Dashboard</button>
-          <button onClick={()=>goTo('admin-orders')}><ClipboardList/> Pedidos</button>
-          <button onClick={()=>goTo('admin-stock')}><Package/> Produtos</button>
-          <button onClick={()=>goTo('admin-stock')}><Warehouse/> Estoque</button>
-        </div>
-        <Link to="/">← Voltar para loja</Link>
-      </aside>
-      <main className="admin-main" id="admin-dashboard">
-        <div className="admin-top"><div><span>PAINEL ADMINISTRATIVO</span><h1>Operação da loja</h1></div><div className="demo-chip">Demo local funcional</div></div>
-        <div className="stats-grid">
-          <StatCard icon={ClipboardList} label="Pedidos" value={orders.length}/>
-          <StatCard icon={CircleDollarSign} label="Vendas registradas" value={money(totalSales)}/>
-          <StatCard icon={PackageCheck} label="Em preparação" value={separating}/>
-          <StatCard icon={AlertTriangle} label="Estoque baixo" value={products.filter(p=>p.stock<=8).length} warn/>
+        <div className="admin-store">
+          <span className="admin-store-dot"></span>
+          <div><b>Loja online</b><small>Operação ativa</small></div>
         </div>
 
+        <div className="admin-nav">
+          <button className={activeSection==='dashboard'?'active':''} onClick={()=>goTo('admin-dashboard','dashboard')}><LayoutDashboard/> <span>Visão geral</span></button>
+          <button className={activeSection==='orders'?'active':''} onClick={()=>goTo('admin-orders','orders')}><ClipboardList/> <span>Pedidos</span><i>{pendingOrders}</i></button>
+          <button className={activeSection==='products'?'active':''} onClick={()=>goTo('admin-stock','products')}><Package/> <span>Produtos</span></button>
+          <button className={activeSection==='stock'?'active':''} onClick={()=>goTo('admin-stock','stock')}><Warehouse/> <span>Estoque</span><i>{lowStock.length}</i></button>
+        </div>
+
+        <div className="admin-sidebar-footer">
+          <div className="admin-help"><CheckCircle2/><span><b>Sistema operacional</b><small>Dados salvos localmente</small></span></div>
+          <Link to="/">← Voltar para loja</Link>
+        </div>
+      </aside>
+
+      <main className="admin-main" id="admin-dashboard">
+        <header className="admin-top">
+          <div>
+            <span>PAINEL ADMINISTRATIVO</span>
+            <h1>Bom dia, D' Paula 👋</h1>
+            <p>Acompanhe pedidos, vendas e estoque em um só lugar.</p>
+          </div>
+          <div className="admin-top-actions">
+            <div className="admin-date"><Clock size={16}/><span>Hoje</span></div>
+            <div className="admin-live"><span></span> Operação online</div>
+          </div>
+        </header>
+
+        <section className="stats-grid admin-kpis">
+          <StatCard icon={CircleDollarSign} label="Vendas registradas" value={money(totalSales)}/>
+          <StatCard icon={ClipboardList} label="Pedidos" value={orders.length}/>
+          <StatCard icon={PackageCheck} label="Ticket médio" value={money(avgTicket)}/>
+          <StatCard icon={AlertTriangle} label="Estoque crítico" value={lowStock.length} warn/>
+        </section>
+
+        <section className="admin-dashboard-grid">
+          <article className="admin-panel sales-card">
+            <div className="panel-title">
+              <div><h2>Desempenho de vendas</h2><p>Visão demonstrativa dos últimos 7 dias.</p></div>
+              <span className="trend-up">+18,4%</span>
+            </div>
+            <div className="sales-chart">
+              {salesBars.map((bar,index)=><div className="bar-col" key={bar.label}>
+                <div className="bar-track"><div className="bar-fill" style={{height:bar.value+'%'}}></div></div>
+                <span>{bar.label}</span>
+              </div>)}
+            </div>
+          </article>
+
+          <article className="admin-panel operation-card">
+            <div className="panel-title"><div><h2>Resumo operacional</h2><p>O que precisa da sua atenção agora.</p></div></div>
+            <div className="operation-list">
+              <button onClick={()=>goTo('admin-orders','orders')}><span className="op-icon blue"><ClipboardList/></span><div><b>{pendingOrders} pedidos pendentes</b><small>Aguardando avanço no fluxo</small></div><ChevronRight/></button>
+              <button onClick={()=>goTo('admin-orders','orders')}><span className="op-icon green"><CheckCircle2/></span><div><b>{readyOrders} prontos para retirada</b><small>Pedidos aguardando cliente</small></div><ChevronRight/></button>
+              <button onClick={()=>goTo('admin-stock','stock')}><span className="op-icon amber"><AlertTriangle/></span><div><b>{lowStock.length} itens com estoque baixo</b><small>Reabastecimento recomendado</small></div><ChevronRight/></button>
+              <div className="operation-progress"><span>Pedidos concluídos</span><strong>{completedOrders}/{orders.length || 0}</strong><div><i style={{width:(orders.length?Math.round((completedOrders/orders.length)*100):0)+'%'}}></i></div></div>
+            </div>
+          </article>
+        </section>
+
         <section className="admin-panel" id="admin-orders">
-          <div className="panel-title"><div><h2>Pedidos</h2><p>Pedidos feitos na loja aparecem aqui automaticamente neste navegador.</p></div></div>
+          <div className="panel-title">
+            <div><h2>Pedidos recentes</h2><p>Receba, acompanhe e atualize cada pedido da operação.</p></div>
+            <span className="panel-count">{orders.length} pedidos</span>
+          </div>
           <div className="orders-table">
             <div className="table-row table-head"><span>Pedido</span><span>Cliente</span><span>Itens</span><span>Total</span><span>Status</span><span>Ação</span></div>
             {orders.map(order=><div className="table-row order-row" key={order.id}>
@@ -407,15 +474,38 @@ function Admin() {
           </div>
         </section>
 
-        <section className="admin-panel" id="admin-stock">
-          <div className="panel-title"><div><h2>Controle de estoque</h2><p>As alterações refletem na vitrine da loja neste navegador.</p></div></div>
-          <div className="stock-grid">
-            {products.map(p=><div className="stock-item" key={p.id}>
-              <img src={p.image} alt={p.name} loading="lazy" decoding="async"/>
-              <div className="stock-info"><strong>{p.name}</strong><span>{p.category} · {money(p.price)}</span></div>
-              <div className="stock-control"><button onClick={()=>changeStock(p.id,-1)}><Minus size={16}/></button><b>{p.stock}</b><button onClick={()=>changeStock(p.id,1)}><Plus size={16}/></button></div>
-            </div>)}
-          </div>
+        <section className="admin-bottom-grid">
+          <article className="admin-panel" id="admin-stock">
+            <div className="panel-title">
+              <div><h2>Estoque e produtos</h2><p>Ajuste rapidamente a disponibilidade dos itens.</p></div>
+              <span className="panel-count">{products.length} produtos</span>
+            </div>
+            <div className="stock-grid">
+              {products.map(p=><div className={'stock-item '+(p.stock<=8?'low-stock':'')} key={p.id}>
+                <div className="stock-thumb"><img src={p.image} alt={p.name} loading="lazy" decoding="async"/></div>
+                <div className="stock-info"><strong>{p.name}</strong><span>{p.category} · {money(p.price)}</span>{p.stock<=8&&<small>Estoque baixo</small>}</div>
+                <div className="stock-control"><button onClick={()=>changeStock(p.id,-1)}><Minus size={16}/></button><b>{p.stock}</b><button onClick={()=>changeStock(p.id,1)}><Plus size={16}/></button></div>
+              </div>)}
+            </div>
+          </article>
+
+          <aside className="admin-side-stack">
+            <article className="admin-panel mini-panel">
+              <div className="panel-title"><div><h2>Mais vendidos</h2><p>Destaques da vitrine.</p></div></div>
+              <div className="best-sellers">
+                {products.slice(0,4).map((p,index)=><div key={p.id}><span>{index+1}</span><img src={p.image} alt=""/><div><b>{p.brand}</b><small>{p.name}</small></div><strong>{money(p.price)}</strong></div>)}
+              </div>
+            </article>
+
+            <article className="admin-panel mini-panel">
+              <div className="panel-title"><div><h2>Últimas movimentações</h2><p>Resumo rápido da operação.</p></div></div>
+              <div className="activity-list">
+                <div><span className="activity-dot blue"></span><p><b>Novo pedido recebido</b><small>{orders[0]?.id || '#0000'} · {orders[0]?.customer || 'Cliente'}</small></p></div>
+                <div><span className="activity-dot green"></span><p><b>Pedido concluído</b><small>{completedOrders} concluído(s) até agora</small></p></div>
+                <div><span className="activity-dot amber"></span><p><b>Estoque monitorado</b><small>{lowStock.length} item(ns) abaixo do nível ideal</small></p></div>
+              </div>
+            </article>
+          </aside>
         </section>
       </main>
     </div>
