@@ -17,17 +17,17 @@ const petPhotos = {
 const heroBanners = [
   {
     id: 1,
-    src: '/banners/banner-1.webp',
+    src: '/banners/banner-1.png',
     alt: "D' Paula Casa do Criador — compre online com mais praticidade",
   },
   {
     id: 2,
-    src: '/banners/banner-2.webp',
+    src: '/banners/banner-2.png',
     alt: "D' Paula Casa do Criador — rações e produtos para cães, gatos, pássaros e coelhos",
   },
   {
     id: 3,
-    src: '/banners/banner-3.webp',
+    src: '/banners/banner-3.png',
     alt: "D' Paula Casa do Criador — ofertas especiais para o seu pet",
   },
 ]
