@@ -232,7 +232,23 @@ function Storefront() {
           <div className="products-grid">
             {filtered.map(product => (
               <article className="product-card" key={product.id}>
-                <div className="product-visual"><img src={product.image} alt={product.name}/></div>
+                <div className="product-visual">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e)=>{
+                      e.currentTarget.style.display='none'
+                      const fallback=e.currentTarget.nextElementSibling
+                      if(fallback) fallback.style.display='grid'
+                    }}
+                  />
+                  <div className="product-fallback" aria-hidden="true">
+                    <span>{product.brand}</span>
+                    <b>{product.category}</b>
+                  </div>
+                </div>
                 <span className="product-brand">{product.brand}</span>
                 <h3>{product.name}</h3>
                 <div className="rating">★★★★★ <small>produto real</small></div>
@@ -361,7 +377,7 @@ function Admin() {
           <div className="panel-title"><div><h2>Controle de estoque</h2><p>As alterações refletem na vitrine da loja neste navegador.</p></div></div>
           <div className="stock-grid">
             {products.map(p=><div className="stock-item" key={p.id}>
-              <img src={p.image} alt=""/>
+              <img src={p.image} alt={p.name} loading="lazy" decoding="async"/>
               <div className="stock-info"><strong>{p.name}</strong><span>{p.category} · {money(p.price)}</span></div>
               <div className="stock-control"><button onClick={()=>changeStock(p.id,-1)}><Minus size={16}/></button><b>{p.stock}</b><button onClick={()=>changeStock(p.id,1)}><Plus size={16}/></button></div>
             </div>)}
