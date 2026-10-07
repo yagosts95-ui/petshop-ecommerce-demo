@@ -211,3 +211,6 @@
   .section-heading h2{font-size:22px}
   .section-heading p{font-size:11px}
 }
+
+/* Banner carousel: autoplay only, no directional arrows */
+.hero-arrow{display:none!important}
