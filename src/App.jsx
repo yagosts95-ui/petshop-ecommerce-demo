@@ -70,7 +70,7 @@ function usePersistentState(key, fallback) {
 }
 
 function Logo() {
-  return <div className="brand-image" role="img" aria-label="D' Paula Casa do Criador" />
+  return <img className="brand-logo" src="/brand/logo-id-digital.png" alt="D' Paula Casa do Criador" />
 }
 
 function money(value) {
@@ -84,6 +84,7 @@ function Storefront() {
   const [query, setQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [currentBanner, setCurrentBanner] = useState(0)
+  const [loadedBanners, setLoadedBanners] = useState({0:true})
   const [cartOpen, setCartOpen] = useState(false)
   const [ordersOpen, setOrdersOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
@@ -91,8 +92,19 @@ function Storefront() {
   const [form, setForm] = useState({ name: '', phone: '', fulfillment: 'Retirada', address: '', payment: 'Pix' })
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentBanner(p => (p + 1) % heroBanners.length), 5500)
-    return () => clearInterval(timer)
+    const preload = (index) => {
+      const img = new Image()
+      img.src = heroBanners[index].src
+      img.onload = () => setLoadedBanners(current => ({...current, [index]: true}))
+    }
+    const firstFollowUp = window.setTimeout(() => preload(1), 900)
+    const secondFollowUp = window.setTimeout(() => preload(2), 1800)
+    const timer = window.setInterval(() => setCurrentBanner(p => (p + 1) % heroBanners.length), 6500)
+    return () => {
+      window.clearTimeout(firstFollowUp)
+      window.clearTimeout(secondFollowUp)
+      window.clearInterval(timer)
+    }
   }, [])
 
   const filtered = useMemo(() => products.filter(p => {
@@ -185,7 +197,15 @@ function Storefront() {
         <section className="hero-slider-wrap">
           <div className="hero-slider-frame">
             {heroBanners.map((banner, index) => (
-              <img key={banner.id} src={banner.src} alt={banner.alt} className={'hero-banner-image ' + (index === currentBanner ? 'active' : '')}/>
+              <img
+                key={banner.id}
+                src={banner.src}
+                alt={banner.alt}
+                className={'hero-banner-image ' + (index === currentBanner ? 'active' : '')}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                fetchPriority={index === 0 ? 'high' : 'low'}
+                decoding="async"
+              />
             ))}
             <button className="hero-arrow hero-arrow-left" onClick={()=>setCurrentBanner(p=>p===0?heroBanners.length-1:p-1)}>‹</button>
             <button className="hero-arrow hero-arrow-right" onClick={()=>setCurrentBanner(p=>(p+1)%heroBanners.length)}>›</button>
