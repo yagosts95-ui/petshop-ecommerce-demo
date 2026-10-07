@@ -2,10 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import {
   Menu, Search, UserRound, ShoppingCart, Dog, Cat, Bird, Rabbit,
-  Bone, HeartPulse, Tag, MessageCircle, Store, Truck, CheckCircle2,
-  PackageCheck, CircleDollarSign, AlertTriangle, ChevronRight,
-  Plus, Minus, LayoutDashboard, ClipboardList, Package, Warehouse
+  Bone, HeartPulse, Tag, Store, Truck, CheckCircle2, PackageCheck,
+  CircleDollarSign, AlertTriangle, ChevronRight, Plus, Minus,
+  LayoutDashboard, ClipboardList, Package, Warehouse, X, Trash2,
+  Clock
 } from 'lucide-react'
+
+const STORAGE_PRODUCTS = 'depaula_demo_products_v2'
+const STORAGE_ORDERS = 'depaula_demo_orders_v2'
 
 const petPhotos = {
   dog: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=88',
@@ -15,21 +19,9 @@ const petPhotos = {
 }
 
 const heroBanners = [
-  {
-    id: 1,
-    src: '/banners/banner-1.png',
-    alt: "D' Paula Casa do Criador — compre online com mais praticidade",
-  },
-  {
-    id: 2,
-    src: '/banners/banner-2.png',
-    alt: "D' Paula Casa do Criador — rações e produtos para cães, gatos, pássaros e coelhos",
-  },
-  {
-    id: 3,
-    src: '/banners/banner-3.png',
-    alt: "D' Paula Casa do Criador — ofertas especiais para o seu pet",
-  },
+  { id: 1, src: '/banners/banner-1.png', alt: "Compre online com mais praticidade" },
+  { id: 2, src: '/banners/banner-2.png', alt: "Rações e produtos para cães, gatos, pássaros e coelhos" },
+  { id: 3, src: '/banners/banner-3.png', alt: "Ofertas especiais para o seu pet" },
 ]
 
 const categories = [
@@ -40,109 +32,140 @@ const categories = [
 ]
 
 const initialProducts = [
-  { id: 1, name: 'Ração Golden Formula Carne, Arroz e Vegetais Cães Adultos 15kg', price: 179.90, stock: 10, category: 'Cães', brand: 'PremieR', badge: 'GOLDEN', accent: '#123e7c', detail: '15 kg' },
-  { id: 2, name: 'Ração Whiskas Carne para Gatos Adultos 10,1kg', price: 199.90, stock: 14, category: 'Gatos', brand: 'Whiskas', badge: 'WHISKAS', accent: '#8d1b8d', detail: '10,1 kg' },
-  { id: 3, name: 'Ração GranPlus Choice Gatos Adultos Frango e Carne 10,1kg', price: 119.99, stock: 8, category: 'Gatos', brand: 'GranPlus', badge: 'CHOICE', accent: '#bb1839', detail: '10,1 kg' },
-  { id: 4, name: 'Ração Nutrópica Calopsita Gourmet 300g', price: 49.99, stock: 16, category: 'Pássaros', brand: 'Nutrópica', badge: 'GOURMET', accent: '#ecad00', detail: '300 g' },
-  { id: 5, name: 'Mistura para Calopsita, Agapornis e Rose Faces 500g', price: 10.50, stock: 24, category: 'Pássaros', brand: 'Nutripássaros', badge: 'MIX AVES', accent: '#d8a400', detail: '500 g' },
-  { id: 6, name: 'Areia Pipicat Classic para Gatos 4kg', price: 40.90, stock: 9, category: 'Gatos', brand: 'Pipicat', badge: 'CLASSIC', accent: '#5e6bb4', detail: '4 kg' },
-  { id: 7, name: 'Ração Nutrópica para Coelho Adulto Super Premium 500g', price: 49.99, stock: 7, category: 'Coelhos', brand: 'Nutrópica', badge: 'COELHO', accent: '#669a4d', detail: '500 g' },
-  { id: 8, name: 'Ração Funny Bunny Delícias da Horta 500g', price: 21.99, stock: 12, category: 'Coelhos', brand: 'Supra', badge: 'FUNNY BUNNY', accent: '#7ca55b', detail: '500 g' },
+  { id: 1, name: 'Ração Golden Formula Carne e Arroz Cães Adultos 15kg', price: 179.90, stock: 10, category: 'Cães', brand: 'PremieR Golden', image: 'https://down-br.img.susercontent.com/file/aee335f5884fc05f236f2b1f0b616a28' },
+  { id: 2, name: 'Pedigree Dentastix Daily Oral Care', price: 18.90, stock: 19, category: 'Cães', brand: 'Pedigree', image: 'https://www.petcircle.com.au/_next/image?q=70&url=https%3A%2F%2Fimages.cdn.australia-southeast1.gcp.commercetools.com%2F1e471ab9-fac6-4ff5-a665-db98006e8969%2FPEDIGREE%2520Dentastix%2520L-0LjoaeY5.png&w=3840' },
+  { id: 3, name: 'Ração Whiskas Carne para Gatos Adultos 10,1kg', price: 194.00, stock: 14, category: 'Gatos', brand: 'Whiskas', image: 'https://cdn.awsli.com.br/1714/1714337/produto/266796472/racao-whiskas-carne-gatos-adultos-101-kg-1-removebg-preview-lcbpckuxx1.png' },
+  { id: 4, name: 'Ração GranPlus Choice Gatos Adultos Frango e Carne 10,1kg', price: 144.99, stock: 8, category: 'Gatos', brand: 'GranPlus', image: 'https://down-br.img.susercontent.com/file/br-11134207-7r98o-lz6mamyp53xhd9' },
+  { id: 5, name: 'Areia Higiênica Pipicat Classic 4kg', price: 15.99, stock: 9, category: 'Gatos', brand: 'Pipicat', image: 'https://cdn.awsli.com.br/800x800/1999/1999267/produto/306072262/areia-higienica-para-gatos-pipicat-classic-4kg-7nk4xc7yq5.jpg' },
+  { id: 6, name: 'Ração Nutrópica Gourmet para Calopsitas 300g', price: 49.99, stock: 16, category: 'Pássaros', brand: 'Nutrópica', image: 'https://images.petz.com.br/fotos/40013030000640_1752259263314.jpg' },
+  { id: 7, name: 'Ração Nutrópica Super Premium Coelho Adulto 500g', price: 49.99, stock: 7, category: 'Coelhos', brand: 'Nutrópica', image: 'https://io.convertiez.com.br/m/petcamp/shop/products/images/1733/large/racao-nutropica-coelho-adulto-500-g-14879_1429.jpg' },
+  { id: 8, name: 'Ração Funny Bunny Delícias da Horta 500g', price: 21.99, stock: 12, category: 'Coelhos', brand: 'Supra', image: 'https://cdn.awsli.com.br/800x800/2757/2757567/produto/280078835/7896803071582-1b5smskzoo.png' },
 ]
 
-const demoOrders = [
-  { id: '#1024', customer: 'Cliente Demo', total: 179.90, status: 'Novo', items: 1 },
-  { id: '#1023', customer: 'Mariana Silva', total: 239.88, status: 'Separando', items: 3 },
-  { id: '#1022', customer: 'Carlos Henrique', total: 90.89, status: 'Pronto', items: 2 },
+const seedOrders = [
+  { id: '#1023', customer: 'Mariana Silva', total: 239.88, status: 'Separando', itemCount: 3, fulfillment: 'Retirada', createdAt: new Date().toISOString(), items: [] },
+  { id: '#1022', customer: 'Carlos Henrique', total: 90.89, status: 'Pronto', itemCount: 2, fulfillment: 'Retirada', createdAt: new Date().toISOString(), items: [] },
 ]
 
-function Logo() {
-  return (
-    <div className="brand">
-      <div className="brand-mark" aria-label="D' Paula Casa do Criador">
-        <span className="brand-roof">⌂</span>
-        <span className="brand-d">D'</span>
-        <small>PAULA</small>
-      </div>
-      <div className="brand-copy">
-        <strong>D' Paula<br/>Casa do Criador</strong>
-        <span>Tudo para o bem-estar do seu pet!</span>
-      </div>
-    </div>
-  )
+function readStorage(key, fallback) {
+  try {
+    const saved = localStorage.getItem(key)
+    return saved ? JSON.parse(saved) : fallback
+  } catch {
+    return fallback
+  }
 }
 
-function ProductVisual({ product }) {
-  return (
-    <div className="product-visual" style={{'--accent': product.accent}}>
-      <div className="real-pack">
-        <div className="pack-top">{product.brand}</div>
-        <b>{product.badge}</b>
-        <span>{product.category}</span>
-        <small>{product.detail}</small>
-      </div>
-    </div>
-  )
+function usePersistentState(key, fallback) {
+  const [value, setValue] = useState(() => readStorage(key, fallback))
+  useEffect(() => { localStorage.setItem(key, JSON.stringify(value)) }, [key, value])
+  useEffect(() => {
+    const sync = e => {
+      if (e.key === key && e.newValue) setValue(JSON.parse(e.newValue))
+    }
+    window.addEventListener('storage', sync)
+    return () => window.removeEventListener('storage', sync)
+  }, [key])
+  return [value, setValue]
+}
+
+function Logo() {
+  return <div className="brand-image" role="img" aria-label="D' Paula Casa do Criador" />
+}
+
+function money(value) {
+  return 'R$ ' + Number(value).toFixed(2).replace('.', ',')
 }
 
 function Storefront() {
+  const [products, setProducts] = usePersistentState(STORAGE_PRODUCTS, initialProducts)
+  const [orders, setOrders] = usePersistentState(STORAGE_ORDERS, seedOrders)
   const [cart, setCart] = useState([])
   const [query, setQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [currentBanner, setCurrentBanner] = useState(0)
+  const [cartOpen, setCartOpen] = useState(false)
+  const [ordersOpen, setOrdersOpen] = useState(false)
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [lastOrder, setLastOrder] = useState(null)
+  const [form, setForm] = useState({ name: '', phone: '', fulfillment: 'Retirada', address: '', payment: 'Pix' })
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentBanner(prev => (prev + 1) % heroBanners.length)
-    }, 5500)
+    const timer = setInterval(() => setCurrentBanner(p => (p + 1) % heroBanners.length), 5500)
     return () => clearInterval(timer)
   }, [])
 
-  function nextBanner() {
-    setCurrentBanner(prev => (prev + 1) % heroBanners.length)
-  }
-
-  function prevBanner() {
-    setCurrentBanner(prev => prev === 0 ? heroBanners.length - 1 : prev - 1)
-  }
-
-  const products = useMemo(() => initialProducts.filter(p => {
+  const filtered = useMemo(() => products.filter(p => {
     const categoryOk = selectedCategory === 'Todos' || p.category === selectedCategory
-    const queryOk = p.name.toLowerCase().includes(query.toLowerCase())
+    const q = query.trim().toLowerCase()
+    const queryOk = !q || p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
     return categoryOk && queryOk
-  }), [query, selectedCategory])
+  }), [products, query, selectedCategory])
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+  const cartCount = cart.reduce((s, i) => s + i.qty, 0)
+  const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
 
   function add(product) {
+    if (product.stock <= 0) return
     setCart(current => {
       const found = current.find(i => i.id === product.id)
-      if (found) return current.map(i => i.id === product.id ? {...i, qty: i.qty + 1} : i)
-      return [...current, {...product, qty: 1}]
+      if (found) return current.map(i => i.id === product.id ? { ...i, qty: Math.min(i.qty + 1, product.stock) } : i)
+      return [...current, { ...product, qty: 1 }]
     })
+    setCartOpen(true)
+  }
+
+  function changeQty(id, delta) {
+    setCart(current => current.map(i => i.id === id ? { ...i, qty: Math.max(0, Math.min(i.stock, i.qty + delta)) } : i).filter(i => i.qty > 0))
+  }
+
+  function placeOrder(e) {
+    e.preventDefault()
+    if (!form.name.trim() || !form.phone.trim() || cart.length === 0) return
+    if (form.fulfillment === 'Entrega' && !form.address.trim()) return
+    const order = {
+      id: '#' + (1024 + orders.length + 1),
+      customer: form.name.trim(),
+      phone: form.phone.trim(),
+      total: cartTotal,
+      status: 'Novo',
+      itemCount: cartCount,
+      fulfillment: form.fulfillment,
+      address: form.address.trim(),
+      payment: form.payment,
+      createdAt: new Date().toISOString(),
+      items: cart.map(({ id, name, qty, price }) => ({ id, name, qty, price }))
+    }
+    setOrders(current => [order, ...current])
+    setProducts(current => current.map(p => {
+      const line = cart.find(i => i.id === p.id)
+      return line ? { ...p, stock: Math.max(0, p.stock - line.qty) } : p
+    }))
+    setCart([])
+    setCheckoutOpen(false)
+    setCartOpen(false)
+    setLastOrder(order)
   }
 
   return (
     <div className="site-shell">
       <header className="top-header">
         <div className="header-inner">
-          <button className="icon-only mobile-menu" aria-label="Abrir menu"><Menu /></button>
+          <button className="icon-only mobile-menu" aria-label="Abrir categorias"><Menu /></button>
           <Logo />
           <div className="search-wrap desktop-search">
             <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="O que seu pet precisa hoje?" />
-            <button><Search size={20}/></button>
+            <button aria-label="Buscar"><Search size={20}/></button>
           </div>
           <div className="header-actions">
-            <button className="header-action"><UserRound/><span>Minha<br/>Conta</span></button>
-            <button className="header-action"><ShoppingCart/><span>Meu<br/>Carrinho</span><i>{cart.reduce((s,i)=>s+i.qty,0)}</i></button>
-            <a className="whatsapp desktop-wa" href="#"><MessageCircle/> Fale pelo WhatsApp</a>
+            <button className="header-action" onClick={()=>setOrdersOpen(true)}><UserRound/><span>Meus<br/>Pedidos</span></button>
+            <button className="header-action" onClick={()=>setCartOpen(true)}><ShoppingCart/><span>Meu<br/>Carrinho</span><i>{cartCount}</i></button>
           </div>
         </div>
         <div className="mobile-search-wrap">
-          <div className="search-wrap"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="O que seu pet precisa hoje?" /><button><Search size={20}/></button></div>
-          <a className="whatsapp" href="#"><MessageCircle/> Fale pelo WhatsApp <ChevronRight size={18}/></a>
+          <div className="search-wrap"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar produtos..." /><button><Search size={20}/></button></div>
           <div className="mobile-category-strip">
-            <button onClick={()=>setSelectedCategory('Todos')}><Bone size={16}/> Rações</button>
+            <button onClick={()=>setSelectedCategory('Todos')}><Bone size={16}/> Todos</button>
             {categories.map(c => <button key={c.name} onClick={()=>setSelectedCategory(c.name)}><c.icon size={16}/>{c.name}</button>)}
           </div>
         </div>
@@ -155,7 +178,6 @@ function Storefront() {
           {categories.map(c => <button key={c.name} onClick={()=>setSelectedCategory(c.name)}><c.icon size={18}/>{c.name}</button>)}
           <button><HeartPulse size={18}/> Higiene e Saúde</button>
           <button><Tag size={18}/> Promoções</button>
-          <Link to="/admin" className="admin-link">Painel ADM</Link>
         </div>
       </nav>
 
@@ -163,35 +185,19 @@ function Storefront() {
         <section className="hero-slider-wrap">
           <div className="hero-slider-frame">
             {heroBanners.map((banner, index) => (
-              <img
-                key={banner.id}
-                src={banner.src}
-                alt={banner.alt}
-                className={'hero-banner-image ' + (index === currentBanner ? 'active' : '')}
-                loading={index === 0 ? 'eager' : 'lazy'}
-              />
+              <img key={banner.id} src={banner.src} alt={banner.alt} className={'hero-banner-image ' + (index === currentBanner ? 'active' : '')}/>
             ))}
-
-            <button className="hero-arrow hero-arrow-left" onClick={prevBanner} aria-label="Banner anterior" type="button">‹</button>
-            <button className="hero-arrow hero-arrow-right" onClick={nextBanner} aria-label="Próximo banner" type="button">›</button>
-
-            <div className="hero-dots" aria-label="Navegação dos banners">
-              {heroBanners.map((banner, index) => (
-                <button
-                  key={banner.id}
-                  type="button"
-                  className={'hero-dot ' + (index === currentBanner ? 'active' : '')}
-                  onClick={() => setCurrentBanner(index)}
-                  aria-label={'Ir para banner ' + (index + 1)}
-                />
-              ))}
+            <button className="hero-arrow hero-arrow-left" onClick={()=>setCurrentBanner(p=>p===0?heroBanners.length-1:p-1)}>‹</button>
+            <button className="hero-arrow hero-arrow-right" onClick={()=>setCurrentBanner(p=>(p+1)%heroBanners.length)}>›</button>
+            <div className="hero-dots">
+              {heroBanners.map((b,index)=><button key={b.id} className={'hero-dot '+(index===currentBanner?'active':'')} onClick={()=>setCurrentBanner(index)}/>)}
             </div>
           </div>
         </section>
 
         <section className="category-cards section">
           {categories.map(c => (
-            <button key={c.name} className={'category-card ' + c.tone} onClick={()=>setSelectedCategory(c.name)}>
+            <button key={c.name} className={'category-card ' + c.tone} onClick={()=>{setSelectedCategory(c.name);document.getElementById('produtos')?.scrollIntoView({behavior:'smooth'})}}>
               <img className="category-photo" src={c.photo} alt={c.name}/>
               <div className="category-copy"><h3>{c.name}</h3><p>{c.subtitle}</p><span>Ver produtos <ChevronRight size={15}/></span></div>
             </button>
@@ -200,61 +206,102 @@ function Storefront() {
 
         <section id="produtos" className="section products-section">
           <div className="section-heading">
-            <div><h2>Produtos em destaque</h2><span></span><p>Itens reais usados como referência visual para a demonstração.</p></div>
-            <button onClick={()=>setSelectedCategory('Todos')}>Ver todos os produtos <ChevronRight size={18}/></button>
+            <div><h2>Produtos em destaque</h2><span></span><p>Vitrine demonstrativa com produtos reais de mercado.</p></div>
+            <button onClick={()=>setSelectedCategory('Todos')}>Ver todos <ChevronRight size={18}/></button>
           </div>
           <div className="products-grid">
-            {products.map(product => (
+            {filtered.map(product => (
               <article className="product-card" key={product.id}>
-                <ProductVisual product={product}/>
+                <div className="product-visual"><img src={product.image} alt={product.name}/></div>
                 <span className="product-brand">{product.brand}</span>
                 <h3>{product.name}</h3>
-                <div className="rating">★★★★★ <small>produto de referência</small></div>
-                <strong>R$ {product.price.toFixed(2).replace('.', ',')}</strong>
-                <small>Estoque demo: {product.stock} unidades</small>
-                <button onClick={()=>add(product)}><ShoppingCart size={17}/> Adicionar ao carrinho</button>
+                <div className="rating">★★★★★ <small>produto real</small></div>
+                <strong>{money(product.price)}</strong>
+                <small>{product.stock > 0 ? 'Estoque demo: ' + product.stock + ' un.' : 'Indisponível'}</small>
+                <button disabled={product.stock<=0} onClick={()=>add(product)}><ShoppingCart size={17}/> {product.stock>0?'Adicionar ao carrinho':'Indisponível'}</button>
               </article>
             ))}
           </div>
         </section>
 
         <section className="section service-banners">
-          <div className="service-card pickup"><Store/><div><h3>Retirada na loja</h3><p>Compre online, receba a confirmação e retire quando estiver pronto.</p></div><ChevronRight/></div>
-          <div className="service-card support"><MessageCircle/><div><h3>Atendimento via WhatsApp</h3><p>Dúvidas sobre ração, tamanho ou disponibilidade? Fale com a loja.</p></div><ChevronRight/></div>
-          <div className="service-card delivery"><Truck/><div><h3>Entrega para a região</h3><p>Fluxo preparado para incluir entrega conforme a operação da loja.</p></div><ChevronRight/></div>
+          <div className="service-card pickup"><Store/><div><h3>Retirada na loja</h3><p>Faça o pedido pelo site e retire quando estiver pronto.</p></div><ChevronRight/></div>
+          <div className="service-card support"><ShoppingCart/><div><h3>Pedido direto pelo site</h3><p>Catálogo, carrinho e pedido sem depender de atendimento manual.</p></div><ChevronRight/></div>
+          <div className="service-card delivery"><Truck/><div><h3>Entrega para a região</h3><p>Fluxo preparado para retirada ou entrega conforme a operação.</p></div><ChevronRight/></div>
         </section>
-
-        {cart.length > 0 && (
-          <div className="floating-cart">
-            <div><ShoppingCart/><span>{cart.reduce((s,i)=>s+i.qty,0)} itens</span></div>
-            <strong>R$ {cartTotal.toFixed(2).replace('.', ',')}</strong>
-            <button onClick={()=>alert('Checkout demonstrativo: pedido criado com sucesso!')}>Finalizar pedido</button>
-          </div>
-        )}
       </main>
+
+      {cartOpen && <div className="overlay" onClick={()=>setCartOpen(false)}>
+        <aside className="drawer" onClick={e=>e.stopPropagation()}>
+          <div className="drawer-head"><div><small>SEU PEDIDO</small><h2>Carrinho</h2></div><button onClick={()=>setCartOpen(false)}><X/></button></div>
+          <div className="drawer-body">
+            {cart.length===0 ? <div className="empty-state"><ShoppingCart size={40}/><h3>Seu carrinho está vazio</h3><p>Adicione produtos para iniciar um pedido.</p></div> :
+            cart.map(item=><div className="cart-line" key={item.id}>
+              <img src={item.image} alt=""/>
+              <div><strong>{item.name}</strong><span>{money(item.price)}</span>
+                <div className="qty"><button onClick={()=>changeQty(item.id,-1)}><Minus size={14}/></button><b>{item.qty}</b><button onClick={()=>changeQty(item.id,1)}><Plus size={14}/></button></div>
+              </div>
+              <button className="trash" onClick={()=>setCart(c=>c.filter(i=>i.id!==item.id))}><Trash2 size={18}/></button>
+            </div>)}
+          </div>
+          {cart.length>0 && <div className="drawer-foot"><div><span>Total</span><strong>{money(cartTotal)}</strong></div><button className="primary" onClick={()=>setCheckoutOpen(true)}>Continuar pedido</button></div>}
+        </aside>
+      </div>}
+
+      {checkoutOpen && <div className="overlay checkout-overlay">
+        <div className="modal">
+          <div className="drawer-head"><div><small>FINALIZAÇÃO</small><h2>Confirmar pedido</h2></div><button onClick={()=>setCheckoutOpen(false)}><X/></button></div>
+          <form className="checkout-form" onSubmit={placeOrder}>
+            <label>Nome<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Seu nome"/></label>
+            <label>Telefone<input required value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} placeholder="(62) 99999-9999"/></label>
+            <div className="choice-row">
+              <button type="button" className={form.fulfillment==='Retirada'?'selected':''} onClick={()=>setForm({...form,fulfillment:'Retirada'})}><Store/> Retirada</button>
+              <button type="button" className={form.fulfillment==='Entrega'?'selected':''} onClick={()=>setForm({...form,fulfillment:'Entrega'})}><Truck/> Entrega</button>
+            </div>
+            {form.fulfillment==='Entrega' && <label>Endereço<input required value={form.address} onChange={e=>setForm({...form,address:e.target.value})} placeholder="Rua, número e bairro"/></label>}
+            <label>Pagamento<select value={form.payment} onChange={e=>setForm({...form,payment:e.target.value})}><option>Pix</option><option>Dinheiro</option><option>Cartão na retirada</option></select></label>
+            <div className="checkout-summary"><span>{cartCount} item(ns)</span><strong>{money(cartTotal)}</strong></div>
+            <button className="primary" type="submit">Enviar pedido</button>
+          </form>
+        </div>
+      </div>}
+
+      {ordersOpen && <div className="overlay" onClick={()=>setOrdersOpen(false)}>
+        <aside className="drawer" onClick={e=>e.stopPropagation()}>
+          <div className="drawer-head"><div><small>ACOMPANHAMENTO</small><h2>Meus pedidos</h2></div><button onClick={()=>setOrdersOpen(false)}><X/></button></div>
+          <div className="drawer-body orders-list">
+            {orders.length===0 ? <div className="empty-state"><Clock size={40}/><h3>Nenhum pedido ainda</h3></div> :
+            orders.slice(0,8).map(o=><div className="customer-order" key={o.id}><div><strong>{o.id}</strong><span>{o.customer}</span></div><b className={'status '+o.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}>{o.status}</b><small>{o.itemCount} item(ns) · {money(o.total)} · {o.fulfillment}</small></div>)}
+          </div>
+        </aside>
+      </div>}
+
+      {lastOrder && <div className="toast-success"><CheckCircle2/><div><strong>Pedido {lastOrder.id} recebido!</strong><span>Agora ele já aparece no painel administrativo.</span></div><button onClick={()=>setLastOrder(null)}><X size={16}/></button></div>}
     </div>
   )
 }
 
 function StatCard({icon: Icon, label, value, warn}) {
-  return <div className={'stat-card ' + (warn ? 'warn' : '')}><div className="stat-icon"><Icon/></div><div><span>{label}</span><strong>{value}</strong></div></div>
+  return <div className={'stat-card '+(warn?'warn':'')}><div className="stat-icon"><Icon/></div><div><span>{label}</span><strong>{value}</strong></div></div>
 }
 
 function Admin() {
-  const [orders, setOrders] = useState(demoOrders)
-  const [products, setProducts] = useState(initialProducts)
+  const [orders,setOrders]=usePersistentState(STORAGE_ORDERS,seedOrders)
+  const [products,setProducts]=usePersistentState(STORAGE_PRODUCTS,initialProducts)
+  const totalSales = orders.filter(o=>o.status!=='Cancelado').reduce((s,o)=>s+Number(o.total||0),0)
+  const separating = orders.filter(o=>['Aceito','Separando'].includes(o.status)).length
 
   function advanceOrder(id) {
-    const flow = ['Novo','Aceito','Separando','Pronto','Concluído']
-    setOrders(current => current.map(o => {
-      if (o.id !== id) return o
-      const idx = flow.indexOf(o.status)
-      return {...o, status: flow[Math.min(idx + 1, flow.length - 1)]}
+    const flow=['Novo','Aceito','Separando','Pronto','Concluído']
+    setOrders(current=>current.map(o=>{
+      if(o.id!==id) return o
+      const idx=flow.indexOf(o.status)
+      return {...o,status:flow[Math.min(idx+1,flow.length-1)]}
     }))
   }
 
-  function changeStock(id, delta) {
-    setProducts(current => current.map(p => p.id === id ? {...p, stock: Math.max(0, p.stock + delta)} : p))
+  function changeStock(id,delta) {
+    setProducts(current=>current.map(p=>p.id===id?{...p,stock:Math.max(0,p.stock+delta)}:p))
   }
 
   return (
@@ -270,40 +317,34 @@ function Admin() {
         <Link to="/">← Voltar para loja</Link>
       </aside>
       <main className="admin-main">
-        <div className="admin-top"><div><span>PAINEL ADMINISTRATIVO</span><h1>Hoje na D' Paula</h1></div><div className="demo-chip">Dados da demonstração</div></div>
+        <div className="admin-top"><div><span>PAINEL ADMINISTRATIVO</span><h1>Operação da loja</h1></div><div className="demo-chip">Demo local funcional</div></div>
         <div className="stats-grid">
-          <StatCard icon={ClipboardList} label="Pedidos hoje" value="12"/>
-          <StatCard icon={CircleDollarSign} label="Vendas hoje" value="R$ 1.487,30"/>
-          <StatCard icon={PackageCheck} label="Em separação" value="3"/>
+          <StatCard icon={ClipboardList} label="Pedidos" value={orders.length}/>
+          <StatCard icon={CircleDollarSign} label="Vendas registradas" value={money(totalSales)}/>
+          <StatCard icon={PackageCheck} label="Em preparação" value={separating}/>
           <StatCard icon={AlertTriangle} label="Estoque baixo" value={products.filter(p=>p.stock<=8).length} warn/>
         </div>
 
         <section className="admin-panel">
-          <div className="panel-title"><div><h2>Pedidos recentes</h2><p>Acompanhe e atualize o status em tempo real.</p></div><button>Ver todos</button></div>
+          <div className="panel-title"><div><h2>Pedidos</h2><p>Pedidos feitos na loja aparecem aqui automaticamente neste navegador.</p></div></div>
           <div className="orders-table">
             <div className="table-row table-head"><span>Pedido</span><span>Cliente</span><span>Itens</span><span>Total</span><span>Status</span><span>Ação</span></div>
-            {orders.map(order => (
-              <div className="table-row" key={order.id}>
-                <strong>{order.id}</strong><span>{order.customer}</span><span>{order.items}</span><span>R$ {order.total.toFixed(2).replace('.', ',')}</span>
-                <span><b className={'status ' + order.status.toLowerCase().replace('í','i')}>{order.status}</b></span>
-                <button className="advance-btn" onClick={()=>advanceOrder(order.id)}>Avançar status</button>
-              </div>
-            ))}
+            {orders.map(order=><div className="table-row" key={order.id}>
+              <strong>{order.id}</strong><span>{order.customer}</span><span>{order.itemCount}</span><span>{money(order.total)}</span>
+              <span><b className={'status '+order.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}>{order.status}</b></span>
+              <button className="advance-btn" disabled={order.status==='Concluído'} onClick={()=>advanceOrder(order.id)}>{order.status==='Concluído'?'Concluído':'Avançar status'}</button>
+            </div>)}
           </div>
         </section>
 
         <section className="admin-panel">
-          <div className="panel-title"><div><h2>Controle de estoque</h2><p>Ajuste a disponibilidade dos principais produtos.</p></div></div>
+          <div className="panel-title"><div><h2>Controle de estoque</h2><p>As alterações refletem na vitrine da loja neste navegador.</p></div></div>
           <div className="stock-grid">
-            {products.slice(0,6).map(p => (
-              <div className="stock-item" key={p.id}>
-                <ProductVisual product={p}/>
-                <div className="stock-info"><strong>{p.name}</strong><span>{p.category}</span></div>
-                <div className="stock-control">
-                  <button onClick={()=>changeStock(p.id,-1)}><Minus size={16}/></button><b>{p.stock}</b><button onClick={()=>changeStock(p.id,1)}><Plus size={16}/></button>
-                </div>
-              </div>
-            ))}
+            {products.map(p=><div className="stock-item" key={p.id}>
+              <img src={p.image} alt=""/>
+              <div className="stock-info"><strong>{p.name}</strong><span>{p.category} · {money(p.price)}</span></div>
+              <div className="stock-control"><button onClick={()=>changeStock(p.id,-1)}><Minus size={16}/></button><b>{p.stock}</b><button onClick={()=>changeStock(p.id,1)}><Plus size={16}/></button></div>
+            </div>)}
           </div>
         </section>
       </main>
@@ -311,6 +352,6 @@ function Admin() {
   )
 }
 
-export default function App() {
+export default function App(){
   return <Routes><Route path="/" element={<Storefront/>}/><Route path="/admin" element={<Admin/>}/></Routes>
 }
