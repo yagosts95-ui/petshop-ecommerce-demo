@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 
 const STORAGE_PRODUCTS = 'depaula_demo_products_v4'
-const STORAGE_ORDERS = 'depaula_demo_orders_v2'
+const STORAGE_ORDERS = 'depaula_demo_orders_v3'
 const STORAGE_CART = 'depaula_demo_cart_v1'
 
 const petPhotos = {
@@ -44,8 +44,36 @@ const initialProducts = [
 ]
 
 const seedOrders = [
-  { id: '#1023', customer: 'Mariana Silva', total: 239.88, status: 'Separando', itemCount: 3, fulfillment: 'Retirada', createdAt: new Date().toISOString(), items: [] },
-  { id: '#1022', customer: 'Carlos Henrique', total: 90.89, status: 'Pronto', itemCount: 2, fulfillment: 'Retirada', createdAt: new Date().toISOString(), items: [] },
+  {
+    id: '#1023',
+    customer: 'Mariana Silva',
+    phone: '(62) 99999-1023',
+    total: 239.88,
+    status: 'Separando',
+    itemCount: 3,
+    fulfillment: 'Retirada',
+    payment: 'Pix',
+    createdAt: new Date().toISOString(),
+    items: [
+      { id: 1, name: 'Ração Golden Formula Carne e Arroz Cães Adultos 15kg', qty: 1, price: 179.90 },
+      { id: 2, name: 'Petisco Pedigree Dentastix Daily Oral Care', qty: 2, price: 29.99 }
+    ]
+  },
+  {
+    id: '#1022',
+    customer: 'Carlos Henrique',
+    phone: '(62) 99999-1022',
+    total: 90.89,
+    status: 'Pronto',
+    itemCount: 2,
+    fulfillment: 'Retirada',
+    payment: 'Dinheiro',
+    createdAt: new Date().toISOString(),
+    items: [
+      { id: 6, name: 'Ração Nutrópica Gourmet para Calopsitas 300g', qty: 1, price: 49.99 },
+      { id: 8, name: 'Ração Funny Bunny Delícias da Horta 500g', qty: 1, price: 40.90 }
+    ]
+  },
 ]
 
 function readStorage(key, fallback) {
@@ -352,6 +380,7 @@ function Admin() {
   const [orders,setOrders]=usePersistentState(STORAGE_ORDERS,seedOrders)
   const [products,setProducts]=usePersistentState(STORAGE_PRODUCTS,initialProducts)
   const [activeSection,setActiveSection]=useState('dashboard')
+  const [selectedOrder,setSelectedOrder]=useState(null)
 
   const activeOrders = orders.filter(o=>o.status!=='Cancelado')
   const totalSales = activeOrders.reduce((s,o)=>s+Number(o.total||0),0)
@@ -469,7 +498,10 @@ function Admin() {
               <span data-label="Itens">{order.itemCount}</span>
               <span data-label="Total">{money(order.total)}</span>
               <span data-label="Status"><b className={'status '+order.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}>{order.status}</b></span>
-              <button className="advance-btn" disabled={order.status==='Concluído'} onClick={()=>advanceOrder(order.id)}>{order.status==='Concluído'?'Concluído':'Avançar status'}</button>
+              <div className="order-actions">
+                <button className="order-detail-btn" onClick={()=>setSelectedOrder(order)}>Ver pedido</button>
+                <button className="advance-btn" disabled={order.status==='Concluído'} onClick={()=>advanceOrder(order.id)}>{order.status==='Concluído'?'Concluído':'Avançar status'}</button>
+              </div>
             </div>)}
           </div>
         </section>
@@ -507,6 +539,57 @@ function Admin() {
             </article>
           </aside>
         </section>
+
+        {selectedOrder && <div className="overlay checkout-overlay order-detail-overlay" onClick={()=>setSelectedOrder(null)}>
+          <div className="modal order-detail-modal" onClick={e=>e.stopPropagation()}>
+            <div className="drawer-head">
+              <div><small>DETALHES DO PEDIDO</small><h2>{selectedOrder.id}</h2></div>
+              <button onClick={()=>setSelectedOrder(null)}><X/></button>
+            </div>
+
+            <div className="order-detail-body">
+              <div className="order-customer-card">
+                <div><span>Cliente</span><strong>{selectedOrder.customer}</strong></div>
+                <div><span>Telefone</span><strong>{selectedOrder.phone || 'Não informado'}</strong></div>
+                <div><span>Recebimento</span><strong>{selectedOrder.fulfillment || 'Retirada'}</strong></div>
+                <div><span>Pagamento</span><strong>{selectedOrder.payment || 'Não informado'}</strong></div>
+                {selectedOrder.address && <div className="order-address"><span>Endereço</span><strong>{selectedOrder.address}</strong></div>}
+              </div>
+
+              <div className="order-items-block">
+                <div className="order-items-title"><h3>Itens do pedido</h3><span>{selectedOrder.itemCount} item(ns)</span></div>
+                {selectedOrder.items?.length ? selectedOrder.items.map((item,index)=>
+                  <div className="order-item-row" key={item.id || index}>
+                    <div className="order-item-index">{index+1}</div>
+                    <div className="order-item-copy">
+                      <strong>{item.name}</strong>
+                      <span>{item.qty} × {money(item.price)}</span>
+                    </div>
+                    <b>{money(item.qty * item.price)}</b>
+                  </div>
+                ) : <div className="order-items-empty">Este pedido antigo não possui detalhamento de itens salvo.</div>}
+              </div>
+
+              <div className="order-detail-total">
+                <span>Total do pedido</span>
+                <strong>{money(selectedOrder.total)}</strong>
+              </div>
+
+              <div className="order-detail-footer">
+                <b className={'status '+selectedOrder.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}>{selectedOrder.status}</b>
+                <button className="advance-btn" disabled={selectedOrder.status==='Concluído'} onClick={()=>{
+                  advanceOrder(selectedOrder.id)
+                  setSelectedOrder(current=>{
+                    if(!current) return current
+                    const flow=['Novo','Aceito','Separando','Pronto','Concluído']
+                    const idx=flow.indexOf(current.status)
+                    return {...current,status:flow[Math.min(idx+1,flow.length-1)]}
+                  })
+                }}>{selectedOrder.status==='Concluído'?'Pedido concluído':'Avançar status'}</button>
+              </div>
+            </div>
+          </div>
+        </div>}
       </main>
     </div>
   )
