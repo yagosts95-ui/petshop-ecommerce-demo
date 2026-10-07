@@ -59,8 +59,12 @@ const demoOrders = [
 function Logo() {
   return (
     <div className="brand">
-      <div className="brand-mark"><span>D'</span><small>PAULA</small></div>
-      <div>
+      <div className="brand-mark" aria-label="D' Paula Casa do Criador">
+        <span className="brand-roof">⌂</span>
+        <span className="brand-d">D'</span>
+        <small>PAULA</small>
+      </div>
+      <div className="brand-copy">
         <strong>D' Paula<br/>Casa do Criador</strong>
         <span>Tudo para o bem-estar do seu pet!</span>
       </div>
@@ -137,6 +141,10 @@ function Storefront() {
         <div className="mobile-search-wrap">
           <div className="search-wrap"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="O que seu pet precisa hoje?" /><button><Search size={20}/></button></div>
           <a className="whatsapp" href="#"><MessageCircle/> Fale pelo WhatsApp <ChevronRight size={18}/></a>
+          <div className="mobile-category-strip">
+            <button onClick={()=>setSelectedCategory('Todos')}><Bone size={16}/> Rações</button>
+            {categories.map(c => <button key={c.name} onClick={()=>setSelectedCategory(c.name)}><c.icon size={16}/>{c.name}</button>)}
+          </div>
         </div>
       </header>
 
