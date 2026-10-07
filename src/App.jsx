@@ -207,8 +207,6 @@ function Storefront() {
                 decoding="async"
               />
             ))}
-            <button className="hero-arrow hero-arrow-left" onClick={()=>setCurrentBanner(p=>p===0?heroBanners.length-1:p-1)}>‹</button>
-            <button className="hero-arrow hero-arrow-right" onClick={()=>setCurrentBanner(p=>(p+1)%heroBanners.length)}>›</button>
             <div className="hero-dots">
               {heroBanners.map((b,index)=><button key={b.id} className={'hero-dot '+(index===currentBanner?'active':'')} onClick={()=>setCurrentBanner(index)}/>)}
             </div>
