@@ -10,6 +10,7 @@ import {
 
 const STORAGE_PRODUCTS = 'depaula_demo_products_v2'
 const STORAGE_ORDERS = 'depaula_demo_orders_v2'
+const STORAGE_CART = 'depaula_demo_cart_v1'
 
 const petPhotos = {
   dog: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=88',
@@ -80,7 +81,7 @@ function money(value) {
 function Storefront() {
   const [products, setProducts] = usePersistentState(STORAGE_PRODUCTS, initialProducts)
   const [orders, setOrders] = usePersistentState(STORAGE_ORDERS, seedOrders)
-  const [cart, setCart] = useState([])
+  const [cart, setCart] = usePersistentState(STORAGE_CART, [])
   const [query, setQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [currentBanner, setCurrentBanner] = useState(0)
@@ -89,6 +90,8 @@ function Storefront() {
   const [ordersOpen, setOrdersOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [lastOrder, setLastOrder] = useState(null)
+  const [lastAdded, setLastAdded] = useState(null)
+  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false)
   const [form, setForm] = useState({ name: '', phone: '', fulfillment: 'Retirada', address: '', payment: 'Pix' })
 
   useEffect(() => {
@@ -124,7 +127,8 @@ function Storefront() {
       if (found) return current.map(i => i.id === product.id ? { ...i, qty: Math.min(i.qty + 1, product.stock) } : i)
       return [...current, { ...product, qty: 1 }]
     })
-    setCartOpen(true)
+    setLastAdded(product)
+    window.setTimeout(() => setLastAdded(null), 1800)
   }
 
   function changeQty(id, delta) {
@@ -163,7 +167,7 @@ function Storefront() {
     <div className="site-shell">
       <header className="top-header">
         <div className="header-inner">
-          <button className="icon-only mobile-menu" aria-label="Abrir categorias"><Menu /></button>
+          <button className="icon-only mobile-menu" aria-label="Abrir categorias" onClick={()=>setMobileCategoriesOpen(true)}><Menu /></button>
           <Logo />
           <div className="search-wrap desktop-search">
             <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="O que seu pet precisa hoje?" />
@@ -176,10 +180,7 @@ function Storefront() {
         </div>
         <div className="mobile-search-wrap">
           <div className="search-wrap"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar produtos..." /><button><Search size={20}/></button></div>
-          <div className="mobile-category-strip">
-            <button onClick={()=>setSelectedCategory('Todos')}><Bone size={16}/> Todos</button>
-            {categories.map(c => <button key={c.name} onClick={()=>setSelectedCategory(c.name)}><c.icon size={16}/>{c.name}</button>)}
-          </div>
+
         </div>
       </header>
 
@@ -211,6 +212,17 @@ function Storefront() {
               {heroBanners.map((b,index)=><button key={b.id} className={'hero-dot '+(index===currentBanner?'active':'')} onClick={()=>setCurrentBanner(index)}/>)}
             </div>
           </div>
+        </section>
+
+        <section className="mobile-category-grid section" aria-label="Categorias">
+          <button className={selectedCategory==='Todos'?'active':''} onClick={()=>{setSelectedCategory('Todos');document.getElementById('produtos')?.scrollIntoView({behavior:'smooth'})}}>
+            <span><Bone/></span><b>Todos</b><small>Ver catálogo</small>
+          </button>
+          {categories.map(c => (
+            <button key={c.name} className={selectedCategory===c.name?'active':''} onClick={()=>{setSelectedCategory(c.name);document.getElementById('produtos')?.scrollIntoView({behavior:'smooth'})}}>
+              <span><c.icon/></span><b>{c.name}</b><small>{c.name==='Cães'?'Rações e petiscos':c.name==='Gatos'?'Rações e higiene':c.name==='Pássaros'?'Sementes e rações':'Rações e feno'}</small>
+            </button>
+          ))}
         </section>
 
         <section className="category-cards section">
@@ -278,7 +290,13 @@ function Storefront() {
               <button className="trash" onClick={()=>setCart(c=>c.filter(i=>i.id!==item.id))}><Trash2 size={18}/></button>
             </div>)}
           </div>
-          {cart.length>0 && <div className="drawer-foot"><div><span>Total</span><strong>{money(cartTotal)}</strong></div><button className="primary" onClick={()=>setCheckoutOpen(true)}>Continuar pedido</button></div>}
+          {cart.length>0 && <div className="drawer-foot">
+            <div><span>Total</span><strong>{money(cartTotal)}</strong></div>
+            <div className="cart-actions">
+              <button className="secondary" onClick={()=>setCartOpen(false)}>Continuar comprando</button>
+              <button className="primary" onClick={()=>{setCartOpen(false);setCheckoutOpen(true)}}>Finalizar pedido</button>
+            </div>
+          </div>}
         </aside>
       </div>}
 
@@ -300,6 +318,16 @@ function Storefront() {
         </div>
       </div>}
 
+      {mobileCategoriesOpen && <div className="overlay mobile-sheet-overlay" onClick={()=>setMobileCategoriesOpen(false)}>
+        <div className="mobile-sheet" onClick={e=>e.stopPropagation()}>
+          <div className="drawer-head"><div><small>NAVEGAÇÃO</small><h2>Categorias</h2></div><button onClick={()=>setMobileCategoriesOpen(false)}><X/></button></div>
+          <div className="mobile-sheet-grid">
+            <button onClick={()=>{setSelectedCategory('Todos');setMobileCategoriesOpen(false)}}><Bone/><span><b>Todos</b><small>Catálogo completo</small></span></button>
+            {categories.map(c=><button key={c.name} onClick={()=>{setSelectedCategory(c.name);setMobileCategoriesOpen(false);setTimeout(()=>document.getElementById('produtos')?.scrollIntoView({behavior:'smooth'}),80)}}><c.icon/><span><b>{c.name}</b><small>{c.subtitle}</small></span></button>)}
+          </div>
+        </div>
+      </div>}
+
       {ordersOpen && <div className="overlay" onClick={()=>setOrdersOpen(false)}>
         <aside className="drawer" onClick={e=>e.stopPropagation()}>
           <div className="drawer-head"><div><small>ACOMPANHAMENTO</small><h2>Meus pedidos</h2></div><button onClick={()=>setOrdersOpen(false)}><X/></button></div>
@@ -310,6 +338,7 @@ function Storefront() {
         </aside>
       </div>}
 
+      {lastAdded && <div className="toast-cart"><CheckCircle2/><div><strong>Adicionado ao carrinho</strong><span>{lastAdded.name}</span></div><button onClick={()=>setCartOpen(true)}>Ver carrinho</button></div>}
       {lastOrder && <div className="toast-success"><CheckCircle2/><div><strong>Pedido {lastOrder.id} recebido!</strong><span>Agora ele já aparece no painel administrativo.</span></div><button onClick={()=>setLastOrder(null)}><X size={16}/></button></div>}
     </div>
   )
