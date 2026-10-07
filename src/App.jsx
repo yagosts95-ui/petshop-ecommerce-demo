@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import {
   Menu, Search, UserRound, ShoppingCart, Dog, Cat, Bird, Rabbit,
@@ -13,6 +13,24 @@ const petPhotos = {
   bird: 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=900&q=88',
   rabbit: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=900&q=88'
 }
+
+const heroBanners = [
+  {
+    id: 1,
+    src: '/banners/banner-1.webp',
+    alt: "D' Paula Casa do Criador — compre online com mais praticidade",
+  },
+  {
+    id: 2,
+    src: '/banners/banner-2.webp',
+    alt: "D' Paula Casa do Criador — rações e produtos para cães, gatos, pássaros e coelhos",
+  },
+  {
+    id: 3,
+    src: '/banners/banner-3.webp',
+    alt: "D' Paula Casa do Criador — ofertas especiais para o seu pet",
+  },
+]
 
 const categories = [
   { name: 'Cães', icon: Dog, subtitle: 'Rações, petiscos e acessórios', tone: 'blue', photo: petPhotos.dog },
@@ -67,6 +85,22 @@ function Storefront() {
   const [cart, setCart] = useState([])
   const [query, setQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Todos')
+  const [currentBanner, setCurrentBanner] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentBanner(prev => (prev + 1) % heroBanners.length)
+    }, 5500)
+    return () => clearInterval(timer)
+  }, [])
+
+  function nextBanner() {
+    setCurrentBanner(prev => (prev + 1) % heroBanners.length)
+  }
+
+  function prevBanner() {
+    setCurrentBanner(prev => prev === 0 ? heroBanners.length - 1 : prev - 1)
+  }
 
   const products = useMemo(() => initialProducts.filter(p => {
     const categoryOk = selectedCategory === 'Todos' || p.category === selectedCategory
@@ -118,35 +152,32 @@ function Storefront() {
       </nav>
 
       <main>
-        <section className="hero hero-v2">
-          <div className="hero-copy">
-            <span className="hero-kicker">D' PAULA CASA DO CRIADOR</span>
-            <h1>Rações e produtos <span>para cães, gatos, pássaros e coelhos!</span></h1>
-            <p>Qualidade, variedade e praticidade para cuidar de quem faz parte da família.</p>
-            <div className="hero-buttons">
-              <button onClick={()=>document.getElementById('produtos')?.scrollIntoView({behavior:'smooth'})}>Ver produtos <ChevronRight/></button>
-              <a href="#" className="hero-secondary"><MessageCircle size={18}/> Pedir ajuda</a>
-            </div>
-            <div className="hero-trust">
-              <span><CheckCircle2 size={16}/> Compra prática</span>
-              <span><Store size={16}/> Retirada na loja</span>
-            </div>
-          </div>
+        <section className="hero-slider-wrap">
+          <div className="hero-slider-frame">
+            {heroBanners.map((banner, index) => (
+              <img
+                key={banner.id}
+                src={banner.src}
+                alt={banner.alt}
+                className={'hero-banner-image ' + (index === currentBanner ? 'active' : '')}
+                loading={index === 0 ? 'eager' : 'lazy'}
+              />
+            ))}
 
-          <div className="hero-photo-stage">
-            <div className="yellow-orbit"></div>
-            <img className="pet-photo dog-photo" src={petPhotos.dog} alt="Cachorro" />
-            <img className="pet-photo cat-photo" src={petPhotos.cat} alt="Gato" />
-            <img className="pet-photo bird-photo" src={petPhotos.bird} alt="Pássaro" />
-            <img className="pet-photo rabbit-photo" src={petPhotos.rabbit} alt="Coelho" />
-            <div className="hero-note">Pets felizes<br/>tornam a vida<br/>mais especial! ♡</div>
-          </div>
+            <button className="hero-arrow hero-arrow-left" onClick={prevBanner} aria-label="Banner anterior" type="button">‹</button>
+            <button className="hero-arrow hero-arrow-right" onClick={nextBanner} aria-label="Próximo banner" type="button">›</button>
 
-          <div className="hero-features">
-            <div><Truck/><span>Entrega para<br/>toda a região</span></div>
-            <div><Store/><span>Retirada<br/>na loja</span></div>
-            <div><CheckCircle2/><span>Produtos<br/>de qualidade</span></div>
-            <div><Dog/><span>Atendimento<br/>especializado</span></div>
+            <div className="hero-dots" aria-label="Navegação dos banners">
+              {heroBanners.map((banner, index) => (
+                <button
+                  key={banner.id}
+                  type="button"
+                  className={'hero-dot ' + (index === currentBanner ? 'active' : '')}
+                  onClick={() => setCurrentBanner(index)}
+                  aria-label={'Ir para banner ' + (index + 1)}
+                />
+              ))}
+            </div>
           </div>
         </section>
 
